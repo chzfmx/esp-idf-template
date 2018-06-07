@@ -5,15 +5,16 @@
 #include "esp_event_loop.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
+#include "wifi_net.h"
+#include "led.h"
+#include "button.h"
 
-esp_err_t event_handler(void *ctx, system_event_t *event)
-{
-    return ESP_OK;
-}
+#define TAG 		"[app_main]"
 
 void app_main(void)
 {
     nvs_flash_init();
+	/*
     tcpip_adapter_init();
     ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -22,21 +23,24 @@ void app_main(void)
     ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
     wifi_config_t sta_config = {
         .sta = {
-            .ssid = "access_point_name",
-            .password = "password",
+            .ssid = "hompe-wifi",
+            .password = "Hompe@0321",
             .bssid_set = false
         }
     };
     ESP_ERROR_CHECK( esp_wifi_set_config(WIFI_IF_STA, &sta_config) );
     ESP_ERROR_CHECK( esp_wifi_start() );
     ESP_ERROR_CHECK( esp_wifi_connect() );
-
-    gpio_set_direction(GPIO_NUM_4, GPIO_MODE_OUTPUT);
-    int level = 0;
+    */
+    ESP_LOGI(TAG, "Create vWifi_Task...");
+	xTaskCreate(vWifi_Task, WIFI_TASK_NAME, WIFI_TASK_STACK_SIZE, NULL, WIFI_TASK_PRIORITY, NULL);
+	ESP_LOGI(TAG, "Create vLed_Task...");
+	xTaskCreate(vLed_Task, LED_TASK_NAME, LED_TASK_STACK_SIZE, NULL, LED_TASK_PRIORITY, NULL);
+	ESP_LOGI(TAG, "Create vButton_Task...");
+	xTaskCreate(vButton_Task,BUTTON_TASK_NAME,BUTTON_TASK_STACK_SIZE,NULL,BUTTON_TASK_PRIORITY,NULL);
     while (true) {
-        gpio_set_level(GPIO_NUM_4, level);
-        level = !level;
-        vTaskDelay(300 / portTICK_PERIOD_MS);
+		//printf("app_main: running......\r\n");
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
     }
 }
 
