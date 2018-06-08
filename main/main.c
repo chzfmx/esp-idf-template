@@ -8,6 +8,7 @@
 #include "wifi_net.h"
 #include "led.h"
 #include "button.h"
+#include "udp_server.h"
 
 #define TAG 		"[app_main]"
 
@@ -38,6 +39,9 @@ void app_main(void)
 	xTaskCreate(vLed_Task, LED_TASK_NAME, LED_TASK_STACK_SIZE, NULL, LED_TASK_PRIORITY, NULL);
 	ESP_LOGI(TAG, "Create vButton_Task...");
 	xTaskCreate(vButton_Task,BUTTON_TASK_NAME,BUTTON_TASK_STACK_SIZE,NULL,BUTTON_TASK_PRIORITY,NULL);
+	vTaskDelay(15000 / portTICK_PERIOD_MS);
+	ESP_LOGI(TAG, "Create vUdpServer_Task...");
+	xTaskCreate(vUdpServer_Task,UDPSERVER_TASK_NAME,UDPSERVER_TASK_STACK_SIZE,NULL,UDPSERVER_TASK_PRIORITY,NULL);
     while (true) {
 		//printf("app_main: running......\r\n");
         vTaskDelay(3000 / portTICK_PERIOD_MS);

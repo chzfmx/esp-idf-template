@@ -1,4 +1,5 @@
 #include "wifi_net.h"
+#include "tcp_client.h"
 
 #define TAG				"[vWifi_Task]"
 
@@ -23,6 +24,7 @@ esp_err_t event_handler(void * ctx, system_event_t * event)
 			ESP_LOGI(TAG, "station:"MACSTR" join, AID=%d",
                  MAC2STR(event->event_info.sta_connected.mac),
                  event->event_info.sta_connected.aid);
+			//xTaskCreate(vTcpClient_Task, CLIENT_TASK_NAME, CLIENT_TASK_STACK_SIZE, NULL, CLIENT_TASK_PRIORITY, NULL);
 			
 		break;
 		case SYSTEM_EVENT_AP_STADISCONNECTED:	//有sta从ESP32 Soft-Ap断开连接
@@ -46,7 +48,8 @@ void vWifi_Task(void * args)
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 	ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 	ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
-	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
+	//ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
+	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
 	wifi_config_t sta_config = {
 		.sta = {
 			.ssid = "hompe-wifi",					//CONFIG_APSTA_STA_SSID,			
@@ -63,7 +66,7 @@ void vWifi_Task(void * args)
 			.authmode = WIFI_AUTH_WPA_PSK
 		}
 	};
-	ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &sta_config));
+	//ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &sta_config));
 	ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &ap_config));
 	ESP_ERROR_CHECK(esp_wifi_start());
 	esp_wifi_connect();
